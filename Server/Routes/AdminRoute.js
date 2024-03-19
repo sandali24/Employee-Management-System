@@ -2,7 +2,10 @@ import express from 'express'
 import con from '../Utils/db.js'
 import jwt from 'jsonwebtoken'
 
+
 const router = express.Router();
+
+
 
 router.post('/adminlogin',(req, res) => {
     console.log(req.body);

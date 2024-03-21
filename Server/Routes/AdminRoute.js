@@ -2,6 +2,9 @@ import express from 'express'
 import con from '../Utils/db.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import multer from 'multer'
+import path from 'path'
+
 
 
 
@@ -47,9 +50,25 @@ router.post('/add_category', (req, res) => {
     })
 })
 
-router.post('/add_employee', (req, res) => {
+
+
+// image upload 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'Public/Images')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname))
+    }
+})
+const upload = multer({
+    storage: storage
+})
+// end imag eupload 
+
+router.post('/add_employee',upload.single('image'), (req, res) => {
     const sql = `INSERT INTO employee 
-    (name, email, password, address, salary, image, category_id) 
+    (name,email,password, address, salary,image, category_id) 
     VALUES (?)`;
 
 //     // Hash password
@@ -79,20 +98,21 @@ router.post('/add_employee', (req, res) => {
 //         });
 //     });
 // });
-    bcrypt.hash(req.body.password.toString(), 10, (err, hash) => {
-        if (err) return res.json({ Status: false, Error: "Query Error1" })
+
+    bcrypt.hash(req.body.password, 10, (err, hash) => {
+        if(err) return res.json({Status: false, Error: "Query Error"})
         const values = [
             req.body.name,
             req.body.email,
             hash,
             req.body.address,
-            req.body.salary,
-            req.body.image,
+            req.body.salary, 
+            req.file.filename,
             req.body.category_id
         ]
         con.query(sql, [values], (err, result) => {
-            if (err) return res.json({ Status: false, Error: "Query Error2" })
-            return res.json({ Status: true })
+            if(err) return res.json({Status: false, Error: err})
+            return res.json({Status: true})
         })
     })
 })

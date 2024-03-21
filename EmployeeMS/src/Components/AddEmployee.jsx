@@ -25,9 +25,17 @@ const AddEmployee = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        axios.post('http://localhost:3000/auth/add_employee', employee)
-        .then(result => console.log(result.data))
-        .catch(err => console.log(err))
+        const formData = new FormData();
+        formData.append('name', employee.name);
+        formData.append('email', employee.email);
+        formData.append('password', employee.password);
+        formData.append('address', employee.address);
+        formData.append('salary', employee.salary);
+        formData.append('image', employee.image);
+        formData.append('category_id', employee.category_id);
+        axios.post('http://localhost:3000/auth/add_employee', formData)
+            .then(result => console.log(result.data))
+            .catch(err => console.log(err))
     }
 
     return (
@@ -84,7 +92,7 @@ const AddEmployee = () => {
                     <div className='col-12'>
                         <label for="category" className="form-lable">Category</label>
                         <select name="category" id="category" className="form-select"
-                        onChange={(e) => setEmployee({...employee, category_id: e.target.value})}>
+                            onChange={(e) => setEmployee({ ...employee, category_id: e.target.value })}>
                             {category.map(c => {
                                 return <option value={c.id} >{c.name}</option>
                             })}
@@ -95,7 +103,8 @@ const AddEmployee = () => {
                         <input type="file"
                             className="form-control rounded-0"
                             id="inputGroupFile01"
-                            onChange={(e) => setEmployee({...employee, image: e.target.files[0]})}
+                            name="image"
+                            onChange={(e) => setEmployee({ ...employee, image: e.target.files[0] })}
                         />
                     </div>
                     <div className="col-12">
